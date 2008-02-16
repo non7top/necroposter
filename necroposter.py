@@ -27,22 +27,29 @@ class necroposter():
 
 	def get_title(self):
 		r = self.tree.xpath('/html/body/center[2]/table[6]/tr/td/table/tr/td[5]/table/tr/td[3]/font/b')
-		title = r[0].text[:-2].strip()
-		return title
+		self.title = r[0].text[:-2].strip()
+		return self.title
 
 	def get_year(self):
 		r = self.tree.xpath("/html/body/center[2]/table[6]/tr/td/table/tr/td[5]/table/tr/td[3]/a/font")
 		#print etree.tostring(r[0])
-		year = r[0].text.strip()
-		return year
+		self.year = r[0].text.strip()
+		return self.year
 		
 	def get_names(self):
 		self.names=[]
 		r = self.tree.xpath("/html/body/center[2]/table[6]/tr/td/table/tr/td[5]/table/tr/td[3]/br")
 		for q in r:
 			self.names.append(q.tail)
-		print self.names
+		return self.names
 	
+	def get_jenres(self):
+		self.jenres=[]
+		p = "//a[starts-with(@href, 'list.php?genre')]"
+		r = self.tree.xpath(p)
+		for q in r:
+			self.jenres.append(q.text)
+		return self.jenres
 	
 	def cat(self, xpath):
 		r = self.tree.xpath(xpath)
@@ -57,7 +64,9 @@ qqq=necroposter()
 qqq.dw_wapage("http://www.world-art.ru/animation/animation.php?id=2699")
 #print qqq.get_title()
 #print qqq.get_year()
-print qqq.get_names()
+#print qqq.get_names()
+#qqq.get_jenres()
+
 #qqq.cat(p)
 #qqq.lsch(p)
 print "finish"
