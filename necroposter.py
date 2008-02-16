@@ -51,6 +51,28 @@ class necroposter():
 			self.jenres.append(q.text)
 		return self.jenres
 	
+	def get_type(self):
+		p="/html/body/center[2]/table[6]/tr/td/table/tr/td[5]/table/tr/td[3]/font[3]/b[3]"
+		r = self.tree.xpath(p)
+		self.type = r[0].tail[2:]
+		return self.type
+
+	def get_episodes(self):
+		try:
+			self.episodes=[]
+			p = "//table[.  = '" + u'Эпизоды:' + "']"
+			r = self.tree.xpath(p)[0].getnext().getnext()
+			rr = r.xpath("tr/td[1]")
+			self.episodes.append( rr[0].text )
+			
+			rrr = r.xpath('tr/td[1]/br')
+			for q in rrr:
+				self.episodes.append(q.tail)
+			return self.episodes
+		except:
+			return 0
+
+	#def get_
 	def cat(self, xpath):
 		r = self.tree.xpath(xpath)
 		print etree.tostring(r[0])
@@ -61,12 +83,14 @@ class necroposter():
 		pass
 
 qqq=necroposter()
-qqq.dw_wapage("http://www.world-art.ru/animation/animation.php?id=2699")
+#qqq.dw_wapage("http://www.world-art.ru/animation/animation.php?id=2699")
+qqq.dw_wapage("http://www.world-art.ru/animation/animation.php?id=82")
 #print qqq.get_title()
 #print qqq.get_year()
 #print qqq.get_names()
-#qqq.get_jenres()
-
+#print qqq.get_jenres()
+#print qqq.get_type()
+print qqq.get_episodes()
 #qqq.cat(p)
 #qqq.lsch(p)
 print "finish"
