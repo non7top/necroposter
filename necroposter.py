@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf8 -*-
 
+import sys
 import base64
 import re
 import urllib
@@ -87,9 +88,11 @@ class necroposter():
 			for q in r:
 				rr = q.xpath('td[3]/a')
 				self.series.append(rr[0].text + rr[0].tail)
+			self.has_s = 1
 			return self.series
 		except:
 			print ">> Single serie"
+			self.has_s = 0
 			return 0
 
 	def get_imglink(self):
@@ -153,7 +156,7 @@ class necroposter():
 		tpl += "\n"
 		tpl += "\n"
 		
-		
+		"""episodes list"""
 		if self.has_ep != 0:
 			tpl += u"[b]Эпизоды:[/b]\n"
 			for q in self.episodes:
@@ -162,16 +165,23 @@ class necroposter():
 		tpl += "\n"
 		tpl += "\n"
 		
+		"""series list"""
+		if self.has_s != 0:
+                        tpl += u"[b]В каком порядке лучше смотреть эту серию:[/b]\n"
+                        for q in self.series:
+                                if q != None:
+                                        tpl += q + "\n"
+                tpl += "\n"
+                tpl += "\n"
 		
-		tpl += u"[url=http://file.aaanet.ru/?search=anime][b]Скачать[/b][/url]"
+		
+		tpl += u"[url=http://file.aaanet.ru/?search=][b]Скачать[/b][/url]"
 		print "_________cut_here_________"
 		print tpl
 		print "_________/cut_here_________"
-		'''
+		
+		print self.imglink['fname']
 
-
-[url=http://www.file.aaanet.ru/134762][b]Скачать[/b][/url]
-'''
 	def cat(self, xpath):
 		r = self.tree.xpath(xpath)
 		print etree.tostring(r[0])
@@ -182,9 +192,16 @@ class necroposter():
 		pass
 	
 
-np=necroposter()
-np.dw_wapage("5653")
-#print np.get_episodes()
-np.init_data()
-np.gen_bbcode()
-
+def main(n):
+	if len(n) == 0:
+		print "Give pagenumber as an argument"
+		sys.exit(1)
+	else:
+		np=necroposter()
+		np.dw_wapage(n[0])
+		#print np.get_episodes()
+		np.init_data()
+		np.gen_bbcode()
+		
+if __name__ == "__main__":
+    main(sys.argv[1:])
