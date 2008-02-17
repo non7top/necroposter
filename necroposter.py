@@ -15,9 +15,9 @@ class necroposter():
 		self.parser = etree.HTMLParser()
 
 	def dw_wapage(self,  wa_addr):
-		wa_addr = "http://www.world-art.ru/animation/animation.php?id=%s" %wa_addr
-		print wa_addr
-		req = urllib2.Request(wa_addr)
+		self.wa_addr = "http://www.world-art.ru/animation/animation.php?id=%s" %wa_addr
+		#print self.wa_addr
+		req = urllib2.Request(self.wa_addr)
 		
 		try:
 			handle = urllib2.urlopen(req)
@@ -70,8 +70,10 @@ class necroposter():
 			rrr = r.xpath('tr/td[1]/br')
 			for q in rrr:
 				self.episodes.append(q.tail)
+			self.has_ep = 1
 			return self.episodes
 		except:
+			self.has_ep = 0
 			print ">> Single episode"
 			return 0
 
@@ -127,7 +129,49 @@ class necroposter():
 		print ">>Init done"
 
 	def gen_bbcode(self):
-		pass
+		tpl="[b][size=4]%s[/size] [color=#8B0000][%s][/color][/b]\n" % (self.title, self.year)
+		tpl += "\n"
+		for q in self.names:
+			tpl += q + "\n"
+		tpl += "\n"
+		
+		tpl+= "[img]http://fstore5.aaanet.ru:8080/139780/placeholder.png[/img]\n\n"
+		
+		tpl += u"[b]Производство:[/b] Япония\n"
+		
+		tpl += u"[b]Жанр:[/b] "
+		for q in self.jenres:
+			tpl += q + ", "
+		tpl = tpl[:-2]
+		tpl += "\n"
+		
+		tpl += u"[b]Тип:[/b] %s" % self.type
+		tpl += "\n"
+		tpl += "\n"
+		
+		tpl += "[url=%s][img]http://fstore5.aaanet.ru:8080/139774/world-art-logo.png[/img][/url]" % self.wa_addr
+		tpl += "\n"
+		tpl += "\n"
+		
+		
+		if self.has_ep != 0:
+			tpl += u"[b]Эпизоды:[/b]\n"
+			for q in self.episodes:
+				if q != None:
+					tpl += str(q) + "\n"
+		tpl += "\n"
+		tpl += "\n"
+		
+		
+		tpl += u"[url=http://file.aaanet.ru/?search=anime][b]Скачать[/b][/url]"
+		print "_________cut_here_________"
+		print tpl
+		print "_________/cut_here_________"
+		'''
+
+
+[url=http://www.file.aaanet.ru/134762][b]Скачать[/b][/url]
+'''
 	def cat(self, xpath):
 		r = self.tree.xpath(xpath)
 		print etree.tostring(r[0])
@@ -138,8 +182,9 @@ class necroposter():
 		pass
 	
 
-qqq=necroposter()
-#qqq.dw_wapage("http://www.world-art.ru/animation/animation.php?id=2699")
-qqq.dw_wapage("82")
-qqq.init_data()
-print "finish"
+np=necroposter()
+np.dw_wapage("5653")
+#print np.get_episodes()
+np.init_data()
+np.gen_bbcode()
+
