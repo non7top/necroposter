@@ -60,7 +60,7 @@ class necroposter():
 		r = self.tree.xpath(p)
 		self.type = r[0].tail[2:]
 		return self.type
-
+	
 	def get_episodes(self):
 		try:
 			self.episodes=[]
@@ -101,14 +101,31 @@ class necroposter():
 		p="/html/body/center/table[6]/tr/td/table/tr/td[5]/table[1]/tr/td[1]/a[1]/img"
 		r = self.tree.xpath(p)
 		link='http://www.world-art.ru/animation/' + r[0].get("src")
-		fname=r[0].get("alt") + '.jpg'
-		self.imglink={'link':link,  'fname':fname}
+		fname="cover/" + r[0].get("alt") + '.jpg'
+		self.imglink={'imglink':link,  'fname':fname}
+		print ">>>> Cover image: %s" %self.imglink['fname']
 		return self.imglink
+
+	'''вытаскиваем номер студии, генерим ссылки и скачиваем эмблему студии'''
+	def get_studio(self):
+		p = "//a[starts-with(@href, 'company_film.php')]"
+		r = self.tree.xpath(p)
+		hr=r[0].get("href")
+		'''дергаем номер студии из линки'''
+		self.studio = {'num': re.findall(r"\d+",hr)[0]}
+		'''генерим ссылку на картинку и ссылку на оптсание студии'''
+		self.studio['link'] = "http://world-art.ru/animation/company_film.php?id=%s" %self.studio['num']
+		self.studio['imglink'] = "http://world-art.ru/img/company/%s.jpg" %self.studio['num']
+		self.studio['fname'] = "studio/%s.jpg" %self.studio['num']
+		
+		'''качаем эмблему студии'''
+		self.dw_img(self.studio)
+		print ">>>> Studio emblem: %s" %self.studio['fname']
 
 	def dw_img(self, imglink):
 		fname=imglink['fname']
-		link=imglink['link']
-		outputFile = open(fname,"wb")
+		link=imglink['imglink']
+		outputFile = open(fname, "wb")
 		
 		req = urllib2.Request(link)
 		try:
@@ -122,6 +139,7 @@ class necroposter():
 		handle.close()
 	
 	def init_data(self):
+		print ">> Start init"
 		self.get_title()
 		self.get_year()
 		self.get_names()
@@ -130,8 +148,9 @@ class necroposter():
 		self.get_episodes()
 		self.get_series()
 		il=self.get_imglink()
+		self.get_studio()
 		self.dw_img(il)
-		print ">>Init done"
+		print ">> Init done"
 
 	def gen_bbcode(self):
 		tpl="[b][size=4]%s[/size] [color=#8B0000][%s][/color][/b]\n" % (self.title, self.year)
@@ -155,6 +174,7 @@ class necroposter():
 		tpl += "\n"
 		
 		tpl += "[url=%s][img]http://fstore5.aaanet.ru:8080/139774/world-art-logo.png[/img][/url]" % self.wa_addr
+		tpl += "[url=%s][img] =====STUDIO_IMG_LINK======= [/img][/url]" % self.studio['link']
 		tpl += "\n"
 		tpl += "\n"
 		
@@ -183,6 +203,7 @@ class necroposter():
 		print "_________/cut_here_________"
 		
 		print self.imglink['fname']
+		print self.studio['fname']
 
 	def cat(self, xpath):
 		r = self.tree.xpath(xpath)
