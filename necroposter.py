@@ -30,19 +30,18 @@ class necroposter():
 		handle.close()
 
 	def get_title(self):
-		r = self.tree.xpath('/html/body/center[2]/table[6]/tr/td/table/tr/td[5]/table/tr/td[3]/font/b')
+		r = self.tree.xpath('/html/body/center/table[6]/tr/td/table/tr/td[5]/table[1]/tr/td[3]/font[1]/b')
 		self.title = r[0].text[:-2].strip()
 		return self.title
 
 	def get_year(self):
-		r = self.tree.xpath("/html/body/center[2]/table[6]/tr/td/table/tr/td[5]/table/tr/td[3]/a/font")
-		#print etree.tostring(r[0])
+		r = self.tree.xpath("/html/body/center/table[6]/tr/td/table/tr/td[5]/table/tr/td[3]/a/font")
 		self.year = r[0].text.strip()
 		return self.year
 		
 	def get_names(self):
 		self.names=[]
-		r = self.tree.xpath("/html/body/center[2]/table[6]/tr/td/table/tr/td[5]/table/tr/td[3]/br")
+		r = self.tree.xpath("/html/body/center/table[6]/tr/td/table/tr/td[5]/table/tr/td[3]/br")
 		for q in r:
 			self.names.append(q.tail)
 		return self.names
@@ -56,7 +55,8 @@ class necroposter():
 		return self.jenres
 	
 	def get_type(self):
-		p="/html/body/center[2]/table[6]/tr/td/table/tr/td[5]/table/tr/td[3]/font[3]/b[3]"
+		p="/html/body/center/table[6]/tr/td/table/tr/td[5]/table/tr/td[3]/font[3]/b[3]"
+		#p="/html/body/center/table[6]/tbody/tr/td/table/tbody/tr/td[5]/table[1]/tbody/tr/td[3]/font[2]/b[3]"
 		r = self.tree.xpath(p)
 		self.type = r[0].tail[2:]
 		return self.type
@@ -97,7 +97,8 @@ class necroposter():
 			return 0
 
 	def get_imglink(self):
-		p="/html/body/center[2]/table[6]/tr/td/table/tr/td[5]/table/tr/td/img"
+		#p="/html/body/center/table[6]/tr/td/table/tr/td[5]/table/tr/td/img"
+		p="/html/body/center/table[6]/tr/td/table/tr/td[5]/table[1]/tr/td[1]/a[1]/img"
 		r = self.tree.xpath(p)
 		link='http://www.world-art.ru/animation/' + r[0].get("src")
 		fname=r[0].get("alt") + '.jpg'
