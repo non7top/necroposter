@@ -118,13 +118,20 @@ class necroposter():
 		print ">>>> Cover image: %s" %self.imglink['fname']
 		return self.imglink
 
+        def get_director(self):
+                p = "//b[. = '" + u'Режиссёр' + "']"
+                r = self.tree.xpath(p)[0].getnext()
+                '''дергаем номер режиссера из линки'''
+                num = self.getnum (r.get("href"))
+                link="http://world-art.ru/people.php?id=%s" % num
+                self.director = {'name': r.text, 'num': num, 'link': link}
+
 	'''вытаскиваем номер студии, генерим ссылки и скачиваем эмблему студии'''
 	def get_studio(self):
 		p = "//a[starts-with(@href, 'company_film.php')]"
 		r = self.tree.xpath(p)
-		hr=r[0].get("href")
 		'''дергаем номер студии из линки'''
-		self.studio = {'num': re.findall(r"\d+",hr)[0]}
+		self.studio = {'num': self.getnum(hr=r[0].get("href"))}
 		'''генерим ссылку на картинку и ссылку на оптсание студии'''
 		self.studio['link'] = "http://world-art.ru/animation/company_film.php?id=%s" %self.studio['num']
 		self.studio['imglink'] = "http://world-art.ru/img/company/%s.jpg" %self.studio['num']
@@ -162,6 +169,7 @@ class necroposter():
 		self.get_episodes()
 		self.get_series()
                 self.get_desc()
+                self.get_director()
 		il=self.get_imglink()
 		self.get_studio()
 		self.dw_img(il)
@@ -185,6 +193,9 @@ class necroposter():
 		tpl += "\n"
 		
 		tpl += u"[b]Тип:[/b] %s" % self.type
+		tpl += "\n"
+                
+                tpl += u"[b]Режиссёр:[/b] [url=" + self.director['link'] + ']' + self.director['name'] + '[/url]'
 		tpl += "\n"
 		tpl += "\n"
 		
@@ -225,6 +236,11 @@ class necroposter():
 		
 		print self.imglink['fname']
 		print self.studio['fname']
+        
+        '''return number from text'''
+        def getnum(self, txt):
+                n = re.findall(r"\d+",txt)[0]
+                return n
 
 	def cat(self, r):
 		print etree.tostring(r[0])

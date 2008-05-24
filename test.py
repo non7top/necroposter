@@ -15,5 +15,6 @@ np=necroposter()
 np.dw_wapage("3284")
 np.init_data()
 #np.get_desc()
+#np.get_director()
 np.gen_bbcode()
 
