@@ -184,8 +184,8 @@ class necroposter():
 			for q in self.episodes:
 				if q != None:
 					tpl += str(q) + "\n"
-		tpl += "\n"
-		tpl += "\n"
+					tpl += "\n"
+					tpl += "\n"
 		
 		"""series list"""
 		if self.has_s != 0:
