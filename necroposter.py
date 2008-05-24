@@ -95,6 +95,18 @@ class necroposter():
 			print ">> Single serie"
 			self.has_s = 0
 			return 0
+        
+        def get_desc(self):
+                try:
+                        p = "//table[.  = '" + u'Краткое содержание:' + "']"
+                        r = self.tree.xpath(p)[0].getnext().getnext()
+                        rr=r.xpath('tr/td/p')
+                        self.desc=rr[0].text
+                except:
+                        self.desc = 0
+                        print ">>>> No desc"
+
+
 
 	def get_imglink(self):
 		#p="/html/body/center/table[6]/tr/td/table/tr/td[5]/table/tr/td/img"
@@ -121,7 +133,9 @@ class necroposter():
 		'''качаем эмблему студии'''
 		self.dw_img(self.studio)
 		print ">>>> Studio emblem: %s" %self.studio['fname']
-
+        
+        '''утиль для скачивания файла, на входе получает словарь с эелементами
+        imglink и fname'''
 	def dw_img(self, imglink):
 		fname=imglink['fname']
 		link=imglink['imglink']
@@ -137,7 +151,7 @@ class necroposter():
 		outputFile.write(data)
 		outputFile.close()
 		handle.close()
-	
+        	
 	def init_data(self):
 		print ">> Start init"
 		self.get_title()
@@ -147,6 +161,7 @@ class necroposter():
 		self.get_type()
 		self.get_episodes()
 		self.get_series()
+                self.get_desc()
 		il=self.get_imglink()
 		self.get_studio()
 		self.dw_img(il)
@@ -174,18 +189,25 @@ class necroposter():
 		tpl += "\n"
 		
 		tpl += "[url=%s][img]http://fstore5.aaanet.ru:8080/139774/world-art-logo.png[/img][/url]" % self.wa_addr
-		tpl += "[url=%s][img] =====STUDIO_IMG_LINK======= [/img][/url]" % self.studio['link']
+		tpl += "[url=%s][img]=STUDIO_IMG_LINK=[/img][/url]" % self.studio['link']
 		tpl += "\n"
 		tpl += "\n"
 		
+                '''Description'''
+                if self.desc != 0:
+                        tpl += u"[b]Краткое содержание:[/b]\n"
+                        tpl += self.desc
+                        tpl += "\n"
+                        tpl += "\n"
+
 		"""episodes list"""
 		if self.has_ep != 0:
 			tpl += u"[b]Эпизоды:[/b]\n"
 			for q in self.episodes:
 				if q != None:
 					tpl += str(q) + "\n"
-					tpl += "\n"
-					tpl += "\n"
+                        tpl += "\n"
+                        tpl += "\n"
 		
 		"""series list"""
 		if self.has_s != 0:
@@ -193,9 +215,8 @@ class necroposter():
                         for q in self.series:
                                 if q != None:
                                         tpl += q + "\n"
-                tpl += "\n"
-                tpl += "\n"
-		
+                        tpl += "\n"
+                        tpl += "\n"
 		
 		tpl += u"[url=http://file.aaanet.ru/?search=][b]Скачать[/b][/url]"
 		print "_________cut_here_________"
@@ -205,8 +226,7 @@ class necroposter():
 		print self.imglink['fname']
 		print self.studio['fname']
 
-	def cat(self, xpath):
-		r = self.tree.xpath(xpath)
+	def cat(self, r):
 		print etree.tostring(r[0])
 	def lsch(self, xpath):
 		r = self.tree.xpath(xpath)
