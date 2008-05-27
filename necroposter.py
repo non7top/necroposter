@@ -19,8 +19,8 @@ class necroposter():
 		self.chkdirs()
 
 	def dw_wapage(self,  wa_addr):
-		self.wa_addr = "http://www.world-art.ru/animation/animation.php?id=%s" %wa_addr
-		#print self.wa_addr
+                pagenum = self.getnum(wa_addr)
+		self.wa_addr = "http://www.world-art.ru/animation/animation.php?id=%s" % pagenum
 		req = urllib2.Request(self.wa_addr)
 		
 		try:
@@ -133,7 +133,7 @@ class necroposter():
 		p = "//a[starts-with(@href, 'company_film.php')]"
 		r = self.tree.xpath(p)
 		'''дергаем номер студии из линки'''
-		self.studio = {'num': self.getnum(hr=r[0].get("href"))}
+		self.studio = {'num': self.getnum(r[0].get("href"))}
 		'''генерим ссылку на картинку и ссылку на оптсание студии'''
 		self.studio['link'] = "http://world-art.ru/animation/company_film.php?id=%s" %self.studio['num']
 		self.studio['imglink'] = "http://world-art.ru/img/company/%s.jpg" %self.studio['num']
@@ -264,7 +264,7 @@ class necroposter():
 
 def main(n):
 	if len(n) == 0:
-		print "Give pagenumber as an argument"
+		print "Give pagenumber or full link as an argument"
 		sys.exit(1)
 	else:
 		np=necroposter()
