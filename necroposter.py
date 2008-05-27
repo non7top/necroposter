@@ -4,6 +4,7 @@
 
 import sys
 import os
+
 import base64
 import re
 import urllib
@@ -12,6 +13,8 @@ from StringIO import StringIO
 
 from lxml import etree
 
+from lib import utils
+
 
 class necroposter():
 	def __init__(self):
@@ -19,7 +22,7 @@ class necroposter():
 		self.chkdirs()
 
 	def dw_wapage(self,  wa_addr):
-                pagenum = self.getnum(wa_addr)
+                pagenum = utils.getnum(wa_addr)
 		self.wa_addr = "http://www.world-art.ru/animation/animation.php?id=%s" % pagenum
 		req = urllib2.Request(self.wa_addr)
 		
@@ -124,7 +127,7 @@ class necroposter():
                 p = "//b[. = '" + u'Режиссёр' + "']"
                 r = self.tree.xpath(p)[0].getnext()
                 '''дергаем номер режиссера из линки'''
-                num = self.getnum (r.get("href"))
+                num = utils.getnum (r.get("href"))
                 link="http://world-art.ru/people.php?id=%s" % num
                 self.director = {'name': r.text, 'num': num, 'link': link}
 
@@ -133,7 +136,7 @@ class necroposter():
 		p = "//a[starts-with(@href, 'company_film.php')]"
 		r = self.tree.xpath(p)
 		'''дергаем номер студии из линки'''
-		self.studio = {'num': self.getnum(r[0].get("href"))}
+		self.studio = {'num': utils.getnum(r[0].get("href"))}
 		'''генерим ссылку на картинку и ссылку на оптсание студии'''
 		self.studio['link'] = "http://world-art.ru/animation/company_film.php?id=%s" %self.studio['num']
 		self.studio['imglink'] = "http://world-art.ru/img/company/%s.jpg" %self.studio['num']
@@ -239,11 +242,6 @@ class necroposter():
 		print self.imglink['fname']
 		print self.studio['fname']
         
-        '''return number from text'''
-        def getnum(self, txt):
-                n = re.findall(r"\d+",txt)[0]
-                return n
-	
 	def chkdirs(self):
 		self.mkdir('studio')
 		self.mkdir('cover')

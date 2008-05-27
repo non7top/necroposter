@@ -9,12 +9,16 @@ import urllib2
 from StringIO import StringIO
 
 from lxml import etree
-from necroposter import necroposter
+#from necroposter import necroposter
 
-np=necroposter()
-np.dw_wapage("3284")
-np.init_data()
+from lib import utils
+
+#np=necroposter()
+#np.dw_wapage("3284")
+#np.init_data()
 #np.get_desc()
 #np.get_director()
-np.gen_bbcode()
+#np.gen_bbcode()
+
+print utils.getnum("dfgsfd3")
 
