@@ -15,17 +15,18 @@ from lib import utils
 class cast():
 	def __init__(self, wa_id):
 		self.id=wa_id
-		self.wa_addr = "http://world-art.ru/animation/animation_full_cast.php?id=%s" % self.id
+		wa_addr = "http://world-art.ru/animation/animation_full_cast.php?id=%s" % self.id
         
                 self.thepage, self.tree = utils.dw_wapage(wa_addr)
+                self.get_actors()
 
-	def get_jenres(self):
-		self.jenres=[]
-		p = "//a[starts-with(@href, 'list.php?genre')]"
+	def get_actors(self):
+		self.actors=[]
+		p = "//b[.  = '" + u'Роли озвучивали:' + "']"
 		r = self.tree.xpath(p)
 		for q in r:
-			self.jenres.append(q.text)
-		return self.jenres
+			self.actors.append(q.text)
+		print self.actors
 	
 	def get_series(self):
 		try:

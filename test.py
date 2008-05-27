@@ -12,6 +12,7 @@ from lxml import etree
 #from necroposter import necroposter
 
 from lib import utils
+from cast import cast
 
 #np=necroposter()
 #np.dw_wapage("3284")
@@ -20,5 +21,5 @@ from lib import utils
 #np.get_director()
 #np.gen_bbcode()
 
-print utils.getnum("dfgsfd3")
-
+c=cast(180)
+print c.tree
