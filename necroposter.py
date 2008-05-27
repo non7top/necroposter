@@ -3,6 +3,7 @@
 
 
 import sys
+import os
 import base64
 import re
 import urllib
@@ -15,6 +16,7 @@ from lxml import etree
 class necroposter():
 	def __init__(self):
 		self.parser = etree.HTMLParser()
+		self.chkdirs()
 
 	def dw_wapage(self,  wa_addr):
 		self.wa_addr = "http://www.world-art.ru/animation/animation.php?id=%s" %wa_addr
@@ -241,9 +243,18 @@ class necroposter():
         def getnum(self, txt):
                 n = re.findall(r"\d+",txt)[0]
                 return n
+	
+	def chkdirs(self):
+		self.mkdir('studio')
+		self.mkdir('cover')
 
+	def mkdir(self, dir):
+                if not os.path.isdir(dir):
+			os.mkdir(dir)
+		
 	def cat(self, r):
 		print etree.tostring(r[0])
+
 	def lsch(self, xpath):
 		r = self.tree.xpath(xpath)
 		for c in r[0]:
