@@ -14,6 +14,7 @@ from StringIO import StringIO
 from lxml import etree
 
 from lib import utils
+from cast import cast
 
 
 class necroposter():
@@ -22,8 +23,8 @@ class necroposter():
 		self.chkdirs()
 
 	def dw_wapage(self,  wa_addr):
-                pagenum = utils.getnum(wa_addr)
-		self.wa_addr = "http://www.world-art.ru/animation/animation.php?id=%s" % pagenum
+                self.pagenum = utils.getnum(wa_addr)
+		self.wa_addr = "http://www.world-art.ru/animation/animation.php?id=%s" % self.pagenum
 		req = urllib2.Request(self.wa_addr)
 		
 		try:
@@ -112,6 +113,9 @@ class necroposter():
                         print ">>>> No desc"
 
 
+        def get_actors(self):
+            c=cast(self.pagenum)
+            self.actors=c.get_actors()
 
 	def get_imglink(self):
 		#p="/html/body/center/table[6]/tr/td/table/tr/td[5]/table/tr/td/img"
@@ -175,6 +179,7 @@ class necroposter():
 		self.get_series()
                 self.get_desc()
                 self.get_director()
+                self.get_actors()
 		il=self.get_imglink()
 		self.get_studio()
 		self.dw_img(il)
@@ -201,6 +206,18 @@ class necroposter():
 		tpl += "\n"
                 
                 tpl += u"[b]Режиссёр:[/b] [url=" + self.director['link'] + ']' + self.director['name'] + '[/url]'
+		tpl += "\n"
+
+                k=0
+                tpl += u'[b]Роли озвучивали:[/b] '
+                for ac in self.actors:
+                    k += 1
+                    if k <= 5:
+                        tpl += '[url=' + ac['ac_link'] + ']' + ac['ac_name'] + '[/url]' + ' (' + ac['ac_role'] + '), '
+
+
+                tpl = tpl[:-2]
+
 		tpl += "\n"
 		tpl += "\n"
 		

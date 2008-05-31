@@ -23,74 +23,21 @@ class cast():
 	def get_actors(self):
 		self.actors=[]
 		p = "//b[.  = '" + u'Роли озвучивали:' + "']"
-		r = self.tree.xpath(p)
+		r = self.tree.xpath(p)[0].getparent().getparent().getparent().getparent()
+                '''walk through all tr elements'''
 		for q in r:
-			self.actors.append(q.text)
-		print self.actors
-	
-	def get_series(self):
-		try:
-			self.series = []
-			p = "//table[.  = '" + u'В каком порядке лучше смотреть эту серию:' + "']"
-			r = self.tree.xpath(p)[0].getnext().getnext()
-			
-			'''прогоняем по списку серий'''
-			for q in r:
-				rr = q.xpath('td[3]/a')
-				self.series.append(rr[0].text + rr[0].tail)
-			self.has_s = 1
-			return self.series
-		except:
-			print ">> Single serie"
-			self.has_s = 0
-			return 0
-        
-        def get_desc(self):
-                try:
-                        p = "//table[.  = '" + u'Краткое содержание:' + "']"
-                        r = self.tree.xpath(p)[0].getnext().getnext()
-                        rr=r.xpath('tr/td/p')
-                        self.desc=rr[0].text
-                except:
-                        self.desc = 0
-                        print ">>>> No desc"
-
-
-
-        
-        '''return number from text'''
-        def getnum(self, txt):
-                n = re.findall(r"\d+",txt)[0]
-                return n
-	
-	def chkdirs(self):
-		self.mkdir('studio')
-		self.mkdir('cover')
-
-	def mkdir(self, dir):
-                if not os.path.isdir(dir):
-			os.mkdir(dir)
-		
-	def cat(self, r):
-		print etree.tostring(r[0])
-
-	def lsch(self, xpath):
-		r = self.tree.xpath(xpath)
-		for c in r[0]:
-			print c.tag
-		pass
-	
-
-def main(n):
-	if len(n) == 0:
-		print "Give pagenumber or full link as an argument"
-		sys.exit(1)
-	else:
-		np=necroposter()
-		np.dw_wapage(n[0])
-		#print np.get_episodes()
-		np.init_data()
-		np.gen_bbcode()
-		
-if __name__ == "__main__":
-    main(sys.argv[1:])
+			#self.actors.append(q.text)
+                        try:
+                                rr = q.xpath("td[2]/a")
+                                ac_name = rr[0].text
+                                ac_id = utils.getnum(rr[0].get("href"))
+                                ac_link = "http://world-art.ru/people.php?id=%s" % ac_id
+                                rr = q.xpath("td[3]")
+                                ac_role = rr[0].text[2:]
+                                self.actors.append({'ac_name':ac_name,'ac_id':ac_id,'ac_role':ac_role,
+                                    'ac_link':ac_link})
+                        except IOError:
+                                pass
+                        except IndexError:
+                                pass
+                return self.actors
