@@ -32,4 +32,4 @@ def dw_wapage(wa_addr):
     tree = etree.parse(StringIO(thepage), parser)
     handle.close()
     return thepage, tree
-                                                                                                                                                                                        
+
