@@ -265,26 +265,27 @@ class necroposter():
 		tpl += "\n"
 		for q in self.names:
 			tpl += q + "\n"
-		tpl += "\n-----------------------------"
+		tpl += "\n-----------------------------\n"
 		
-		tpl += u"[b]Жанр:[/b] "
+		tpl += u"Жанр: "
 		for q in self.jenres:
 			tpl += q + ", "
 		tpl = tpl[:-2]
 		tpl += "\n"
 
-		tpl += u"[b]Производство:[/b] Япония\n"		
+		tpl += u"Производство: Япония\n"		
 
-                tpl += u"[b]Режиссёр:[/b] " + self.director['name']
+                tpl += u"Режиссёр: " + self.director['name']
 		tpl += "\n"
 		
-		tpl += u"[b]Продолжительность:[/b] %s" % self.type
-		tpl += "\n"
+		tpl += u"Продолжительность: %s" % self.type
+		tpl += "\n\n"
 		
 		tpl += self.year
+		tpl += "\n\n"
 
                 k=0
-                tpl += u'[b]Роли озвучивали:[/b] '
+                tpl += u'Роли озвучивали:'
                 for ac in self.actors:
                     k += 1
                     if k <= 5:
@@ -292,6 +293,7 @@ class necroposter():
 
 
                 tpl = tpl[:-2]
+		tpl += "\n\n"
 
                 '''Description'''
                 if self.desc != 0:
@@ -303,9 +305,9 @@ class necroposter():
 		tpl += "\n"
 		tpl += "\n"
 		
-		tpl += "[url=%s]Описание на World-Art.ru[/url]" % self.wa_addr
+		tpl += u"[url=%s]Описание на World-Art.ru[/url]" % self.wa_addr
 		tpl += "\n"
-		tpl += "\n-----------------------------"
+		tpl += "\n-----------------------------\n"
 		
 
 
@@ -362,6 +364,7 @@ def main(n):
 		#print np.get_episodes()
 		np.init_data()
 		np.gen_bbcode()
+                np.gen_spark()
 		
 if __name__ == "__main__":
     main(sys.argv[1:])
