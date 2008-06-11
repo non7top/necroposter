@@ -101,7 +101,7 @@ class necroposter():
 			print ">> Single serie"
 			self.has_s = 0
 			return 0
-        
+	
         def get_desc(self):
                 try:
                         p = "//table[.  = '" + u'Краткое содержание:' + "']"
@@ -112,11 +112,11 @@ class necroposter():
                         self.desc = 0
                         print ">>>> No desc"
 
-
+	
         def get_actors(self):
             c=cast(self.pagenum)
             self.actors=c.get_actors()
-
+	
 	def get_imglink(self):
 		#p="/html/body/center/table[6]/tr/td/table/tr/td[5]/table/tr/td/img"
 		p="/html/body/center/table[6]/tr/td/table/tr/td[5]/table[1]/tr/td[1]/a[1]/img"
@@ -149,7 +149,7 @@ class necroposter():
 		'''качаем эмблему студии'''
 		self.dw_img(self.studio)
 		print ">>>> Studio emblem: %s" %self.studio['fname']
-        
+	
         '''утиль для скачивания файла, на входе получает словарь с эелементами
         imglink и fname'''
 	def dw_img(self, imglink):
@@ -167,7 +167,7 @@ class necroposter():
 		outputFile.write(data)
 		outputFile.close()
 		handle.close()
-        	
+		
 	def init_data(self):
 		print ">> Start init"
 		self.get_title()
@@ -204,7 +204,7 @@ class necroposter():
 		
 		tpl += u"[b]Тип:[/b] %s" % self.type
 		tpl += "\n"
-                
+		
                 tpl += u"[b]Режиссёр:[/b] [url=" + self.director['link'] + ']' + self.director['name'] + '[/url]'
 		tpl += "\n"
 
@@ -258,7 +258,82 @@ class necroposter():
 		
 		print self.imglink['fname']
 		print self.studio['fname']
-        
+	
+	def gen_spark(self):
+		tpl=self.title
+
+		tpl += "\n"
+		for q in self.names:
+			tpl += q + "\n"
+		tpl += "\n-----------------------------"
+		
+		tpl += u"[b]Жанр:[/b] "
+		for q in self.jenres:
+			tpl += q + ", "
+		tpl = tpl[:-2]
+		tpl += "\n"
+
+		tpl += u"[b]Производство:[/b] Япония\n"		
+
+                tpl += u"[b]Режиссёр:[/b] " + self.director['name']
+		tpl += "\n"
+		
+		tpl += u"[b]Продолжительность:[/b] %s" % self.type
+		tpl += "\n"
+		
+		tpl += self.year
+
+                k=0
+                tpl += u'[b]Роли озвучивали:[/b] '
+                for ac in self.actors:
+                    k += 1
+                    if k <= 5:
+                        tpl += '[url=' + ac['ac_link'] + ']' + ac['ac_name'] + '[/url]' + ' (' + ac['ac_role'] + '), '
+
+
+                tpl = tpl[:-2]
+
+                '''Description'''
+                if self.desc != 0:
+                        tpl += u"[b]Краткое содержание:[/b]\n"
+                        tpl += self.desc
+                        tpl += "\n"
+                        tpl += "\n"
+
+		tpl += "\n"
+		tpl += "\n"
+		
+		tpl += "[url=%s]Описание на World-Art.ru[/url]" % self.wa_addr
+		tpl += "\n"
+		tpl += "\n-----------------------------"
+		
+
+
+		"""episodes list"""
+		if self.has_ep != 0:
+			tpl += u"[expand=\"Эпизоды\"]"
+			for q in self.episodes:
+				if q != None:
+					tpl += str(q) + "\n"
+                        tpl += "[/expand]\n"
+                        tpl += "\n"
+		
+		"""series list"""
+		if self.has_s != 0:
+                        tpl += u"[expand=\"В каком порядке лучше смотреть эту серию\"]"
+                        for q in self.series:
+                                if q != None:
+                                        tpl += q + "\n"
+                        tpl += "[/expand]\n"
+                        tpl += "\n"
+		
+		print "_________cut_here_________"
+		print tpl
+		print "_________/cut_here_________"
+		
+		print self.imglink['fname']
+		print self.studio['fname']
+	
 	def chkdirs(self):
 		self.mkdir('studio')
 		self.mkdir('cover')
