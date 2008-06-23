@@ -269,7 +269,7 @@ class necroposter():
 		
 		tpl += u"Жанр: "
 		for q in self.jenres:
-			tpl += q + ", "
+			tpl += q.capitalize() + ", "
 		tpl = tpl[:-2]
 		tpl += "\n"
 
