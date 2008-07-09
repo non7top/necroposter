@@ -20,6 +20,7 @@ from cast import cast
 class necroposter():
 	def __init__(self):
 		self.parser = etree.HTMLParser()
+                self.homedir='/tmp/'
 		self.chkdirs()
 
 	def dw_wapage(self,  wa_addr):
@@ -143,7 +144,7 @@ class necroposter():
 		self.studio = {'num': utils.getnum(r[0].get("href"))}
 		'''генерим ссылку на картинку и ссылку на оптсание студии'''
 		self.studio['link'] = "http://world-art.ru/animation/company_film.php?id=%s" %self.studio['num']
-		self.studio['imglink'] = "http://world-art.ru/img/company/%s.jpg" %self.studio['num']
+		self.studio['imglink'] = "http://www.world-art.ru/img/company/%s.jpg" %self.studio['num']
 		self.studio['fname'] = "studio/%s.jpg" %self.studio['num']
 		
 		'''качаем эмблему студии'''
@@ -156,12 +157,13 @@ class necroposter():
 		fname=imglink['fname']
 		link=imglink['imglink']
 		outputFile = open(fname, "wb")
-		
+		#print link
 		req = urllib2.Request(link)
+		req.add_header("Referer", self.wa_addr)
 		try:
 			handle = urllib2.urlopen(req)
-		except IOError:
-			print "ioerror"
+		except IOError, e:
+			print "ioerror ", e
 		
 		data = handle.read()
 		outputFile.write(data)
@@ -337,8 +339,8 @@ class necroposter():
 		print self.studio['fname']
 	
 	def chkdirs(self):
-		self.mkdir('studio')
-		self.mkdir('cover')
+		self.mkdir(os.path.join (self.homedir ,'studio'))
+		self.mkdir(os.path.join (self.homedir, 'cover'))
 
 	def mkdir(self, dir):
                 if not os.path.isdir(dir):
