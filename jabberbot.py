@@ -22,6 +22,7 @@
 
 import xmpp
 import inspect
+import time
 
 """A simple jabber/xmpp bot framework
 
@@ -181,8 +182,9 @@ class JabberBot(object):
 
         while not self.__finished:
             try:
+        	time.sleep(1.1)
                 conn.Process(1)
-                self.idle_proc()
+                #self.idle_proc()
             except KeyboardInterrupt:
                 self.log('bot stopped by user request. shutting down.')
                 break
