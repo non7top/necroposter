@@ -10,22 +10,30 @@ import re
 import urllib
 import urllib2
 from StringIO import StringIO
+import logging
 
 from lxml import etree
 
 from lib import utils
+from lib import datadir
 from cast import cast
 
+logging.basicConfig(level=logging.DEBUG)
 
 class necroposter():
 	def __init__(self):
+                logging.debug ("Init necroposter class")
 		self.parser = etree.HTMLParser()
-                self.homedir='/tmp/'
-		self.chkdirs()
+                #self.homedir='~/.non7top/necroposter/'
+                self.homedir = datadir.user_data_dir("necroposter")
+                logging.info ("Datadir is: %s" % self.homedir)
+                self.chkdirs()
 
 	def dw_wapage(self,  wa_addr):
+                logging.debug ( "Start dw_wapage" )
                 self.pagenum = utils.getnum(wa_addr)
 		self.wa_addr = "http://www.world-art.ru/animation/animation.php?id=%s" % self.pagenum
+                logging.info( "WA page is %s" % self.wa_addr )
 		req = urllib2.Request(self.wa_addr)
 		
 		try:
@@ -37,11 +45,14 @@ class necroposter():
 		handle.close()
 
 	def get_title(self):
+                logging.debug ("Start get_title")
 		r = self.tree.xpath('/html/body/center/table[6]/tr/td/table/tr/td[5]/table[1]/tr/td[3]/font[1]/b')
 		self.title = r[0].text[:-2].strip()
+                logging.debug ( "Got title: %s" % self.title )
 		return self.title
 
 	def get_year(self):
+                logging.debug ("Starting get_year")
 		r = self.tree.xpath("/html/body/center/table[6]/tr/td/table/tr/td[5]/table/tr/td[3]/a/font")
 		self.year = r[0].text.strip()
 		return self.year
@@ -83,7 +94,7 @@ class necroposter():
 			return self.episodes
 		except:
 			self.has_ep = 0
-			print ">> Single episode"
+                        logging.warning ("Single episode")
 			return 0
 
 	def get_series(self):
@@ -99,7 +110,7 @@ class necroposter():
 			self.has_s = 1
 			return self.series
 		except:
-			print ">> Single serie"
+                        logging.warning ("Single serie")
 			self.has_s = 0
 			return 0
 	
@@ -111,7 +122,7 @@ class necroposter():
                         self.desc=rr[0].text
                 except:
                         self.desc = 0
-                        print ">>>> No desc"
+                        logging.warning ("No description found")
 
 	
         def get_actors(self):
@@ -119,13 +130,16 @@ class necroposter():
             self.actors=c.get_actors()
 	
 	def get_imglink(self):
+                logging.debug ("Start get_imglink")
 		#p="/html/body/center/table[6]/tr/td/table/tr/td[5]/table/tr/td/img"
 		p="/html/body/center/table[6]/tr/td/table/tr/td[5]/table[1]/tr/td[1]/a[1]/img"
 		r = self.tree.xpath(p)
 		link='http://www.world-art.ru/animation/' + r[0].get("src")
-		fname="cover/" + r[0].get("alt") + '.jpg'
+                logging.debug ("Image link is: %s" % link)
+		fname2=r[0].get("alt") + '.jpg'
+                fname=os.path.join (self.homedir, "cover/" + fname2)
+                logging.debug ("Image filename is: %s" % fname)
 		self.imglink={'imglink':link,  'fname':fname}
-		print ">>>> Cover image: %s" %self.imglink['fname']
 		return self.imglink
 
         def get_director(self):
@@ -149,15 +163,15 @@ class necroposter():
 		
 		'''качаем эмблему студии'''
 		self.dw_img(self.studio)
-		print ">>>> Studio emblem: %s" %self.studio['fname']
+                logging.info ("Studio emblem: %s" %self.studio['fname'])
 	
         '''утиль для скачивания файла, на входе получает словарь с эелементами
         imglink и fname'''
 	def dw_img(self, imglink):
 		fname=imglink['fname']
 		link=imglink['imglink']
+                logging.info ( ("Downloading link %s to file %s") % (link, fname) )
 		outputFile = open(fname, "wb")
-		#print link
 		req = urllib2.Request(link)
 		req.add_header("Referer", self.wa_addr)
 		try:
@@ -171,7 +185,7 @@ class necroposter():
 		handle.close()
 		
 	def init_data(self):
-		print ">> Start init"
+                logging.debug ("Start init_data")
 		self.get_title()
 		self.get_year()
 		self.get_names()
@@ -185,7 +199,7 @@ class necroposter():
 		il=self.get_imglink()
 		self.get_studio()
 		self.dw_img(il)
-		print ">> Init done"
+                logging.debug ("Finished init_data")
 
 	def gen_bbcode(self):
 		tpl="[b][size=4]%s[/size] [color=#8B0000][%s][/color][/b]\n" % (self.title, self.year)
@@ -240,7 +254,7 @@ class necroposter():
 			tpl += u"[b]Эпизоды:[/b]\n"
 			for q in self.episodes:
 				if q != None:
-					tpl += str(q) + "\n"
+					tpl += q + "\n"
                         tpl += "\n"
                         tpl += "\n"
 		
@@ -254,12 +268,13 @@ class necroposter():
                         tpl += "\n"
 		
 		tpl += u"[url=http://file.aaanet.ru/?search=][b]Скачать[/b][/url]"
-		print "_________cut_here_________"
-		print tpl
-		print "_________/cut_here_________"
+		#print "_________cut_here_________"
+		#print tpl
+		#print "_________/cut_here_________"
 		
-		print self.imglink['fname']
-		print self.studio['fname']
+		#print self.imglink['fname']
+		#print self.studio['fname']
+                return tpl
 	
 	def gen_spark(self):
 		tpl=self.title
@@ -318,7 +333,7 @@ class necroposter():
 			tpl += u"[expand=\"Эпизоды\"]"
 			for q in self.episodes:
 				if q != None:
-					tpl += str(q) + "\n"
+					tpl += q + "\n"
                         tpl += "[/expand]\n"
                         tpl += "\n"
 		
@@ -331,12 +346,12 @@ class necroposter():
                         tpl += "[/expand]\n"
                         tpl += "\n"
 		
-		print "_________cut_here_________"
-		print tpl
-		print "_________/cut_here_________"
+		#print "_________cut_here_________"
+		#print tpl
+		#print "_________/cut_here_________"
 		
-		print self.imglink['fname']
-		print self.studio['fname']
+		#print self.imglink['fname']
+		#print self.studio['fname']
 	
 	def chkdirs(self):
 		self.mkdir(os.path.join (self.homedir ,'studio'))
@@ -344,7 +359,7 @@ class necroposter():
 
 	def mkdir(self, dir):
                 if not os.path.isdir(dir):
-			os.mkdir(dir)
+			os.makedirs(dir)
 		
 	def cat(self, r):
 		print etree.tostring(r[0])
@@ -365,7 +380,7 @@ def main(n):
 		np.dw_wapage(n[0])
 		#print np.get_episodes()
 		np.init_data()
-		np.gen_bbcode()
+		print np.gen_bbcode()
                 np.gen_spark()
 		
 if __name__ == "__main__":
