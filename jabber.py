@@ -2,8 +2,19 @@ from jabberbot import JabberBot
 import datetime
 from necroposter import necroposter
 import xmpp
+import time
 
 class non7top_jabberbot(JabberBot):
+    def bot_cmd(self, mess, args):
+        return None
+
+    def unknown_command( self, mess, cmd, args):
+        return None
+
+    def loop_proc(self):
+        time.sleep(10)
+        self.conn.send(xmpp.Presence(status="Status ok"))
+
     def bot_serverinfo( self, mess, args):
         """Displays information about the server"""
         version = open('/proc/version').read().strip()
@@ -20,9 +31,9 @@ class non7top_jabberbot(JabberBot):
 
     def bot_conf (self, mess, args):
         """connects to conference"""
-        #presence = xmpp.Presence(to="file@chat.im.aaanet.ru" + '/' + "bot")
+        presence = xmpp.Presence(to="file@chat.im.aaanet.ru" + '/' + "bot")
         #presence.setFrom("non7top@isn7.ru")
-        #self.conn.send(presence)
+        self.conn.send(presence)
         return None
 
     def bot_subscribe( self, mess, args):

@@ -22,7 +22,6 @@
 
 import xmpp
 import inspect
-import time
 
 """A simple jabber/xmpp bot framework
 
@@ -84,7 +83,7 @@ class JabberBot(object):
         if not self.conn:
             conn = xmpp.Client( self.jid.getDomain(), debug = ['always', 'nodebuilder'])
             
-            if not conn.connect():
+            if not conn.connect(server=None, proxy=None, secure=0):
                 self.log( 'unable to connect to server.')
                 return None
             
@@ -164,7 +163,7 @@ class JabberBot(object):
 
         return '%s\n\n%s' % ( description, usage, )
 
-    def idle_proc( self):
+    def loop_proc( self):
         """This function will be called in the main loop."""
         pass
 
@@ -182,9 +181,8 @@ class JabberBot(object):
 
         while not self.__finished:
             try:
-        	time.sleep(1.1)
                 conn.Process(1)
-                #self.idle_proc()
+                self.loop_proc()
             except KeyboardInterrupt:
                 self.log('bot stopped by user request. shutting down.')
                 break
