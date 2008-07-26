@@ -24,7 +24,6 @@ class necroposter():
 	def __init__(self):
                 logging.debug ("Init necroposter class")
 		self.parser = etree.HTMLParser()
-                #self.homedir='~/.non7top/necroposter/'
                 self.homedir = datadir.user_data_dir("necroposter")
                 logging.info ("Datadir is: %s" % self.homedir)
                 self.chkdirs()
@@ -136,9 +135,10 @@ class necroposter():
 		r = self.tree.xpath(p)
 		link='http://www.world-art.ru/animation/' + r[0].get("src")
                 logging.debug ("Image link is: %s" % link)
-		fname2=r[0].get("alt") + '.jpg'
+		#fname2=r[0].get("alt") + '.jpg'
+		fname2=self.pagenum + '.jpg'
                 fname=os.path.join (self.homedir, "cover/" + fname2)
-                logging.debug ("Image filename is: %s" % fname)
+                logging.debug ("Poster filename is: %s" % fname)
 		self.imglink={'imglink':link,  'fname':fname}
 		return self.imglink
 
@@ -159,7 +159,7 @@ class necroposter():
 		'''генерим ссылку на картинку и ссылку на оптсание студии'''
 		self.studio['link'] = "http://world-art.ru/animation/company_film.php?id=%s" %self.studio['num']
 		self.studio['imglink'] = "http://www.world-art.ru/img/company/%s.jpg" %self.studio['num']
-		self.studio['fname'] = "studio/%s.jpg" %self.studio['num']
+		self.studio['fname'] = os.path.join (self.homedir, "studio/%s.jpg" %self.studio['num'])
 		
 		'''качаем эмблему студии'''
 		self.dw_img(self.studio)
@@ -380,7 +380,7 @@ def main(n):
 		np.dw_wapage(n[0])
 		#print np.get_episodes()
 		np.init_data()
-		print np.gen_bbcode()
+		#print np.gen_bbcode()
                 np.gen_spark()
 		
 if __name__ == "__main__":
