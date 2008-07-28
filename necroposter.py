@@ -27,6 +27,7 @@ class necroposter():
                 self.homedir = datadir.user_data_dir("necroposter")
                 logging.info ("Datadir is: %s" % self.homedir)
                 self.chkdirs()
+                self.caching = 1
 
 	def dw_wapage(self,  wa_addr):
                 logging.debug ( "Start dw_wapage" )
@@ -169,6 +170,10 @@ class necroposter():
         imglink и fname'''
 	def dw_img(self, imglink):
 		fname=imglink['fname']
+		if self.caching == 1:
+			if os.path.isfile(fname):
+				logging.debug ("Not re-downloading file")
+				return 0 
 		link=imglink['imglink']
                 logging.info ( ("Downloading link %s to file %s") % (link, fname) )
 		outputFile = open(fname, "wb")
