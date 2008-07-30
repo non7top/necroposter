@@ -35,7 +35,8 @@ class necroposter():
                 self.wa_addr = "http://www.world-art.ru/animation/animation.php?id=%s" % self.pagenum
                 fname2=self.pagenum + '.cache'
                 fname=os.path.join (self.homedir, "cache/" + fname2)
-
+                
+                # TODO: gzip the cache
                 if self.caching == 1 and os.path.isfile(fname):
                         logging.debug ("Not re-downloading file")
                         page_body=open(fname).read()
