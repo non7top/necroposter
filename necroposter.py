@@ -32,17 +32,29 @@ class necroposter():
 	def dw_wapage(self,  wa_addr):
                 logging.debug ( "Start dw_wapage" )
                 self.pagenum = utils.getnum(wa_addr)
-		self.wa_addr = "http://www.world-art.ru/animation/animation.php?id=%s" % self.pagenum
-                logging.info( "WA page is %s" % self.wa_addr )
-		req = urllib2.Request(self.wa_addr)
-		
-		try:
-			handle = urllib2.urlopen(req)
-		except IOError:
-			print "ioerror"
-		self.thepage = unicode( handle.read(),    "cp1251")
+                self.wa_addr = "http://www.world-art.ru/animation/animation.php?id=%s" % self.pagenum
+                fname2=self.pagenum + '.cache'
+                fname=os.path.join (self.homedir, "cache/" + fname2)
+
+                if self.caching == 1 and os.path.isfile(fname):
+                        logging.debug ("Not re-downloading file")
+                        page_body=open(fname).read()
+                else:
+                        logging.info( "WA page is %s" % self.wa_addr )
+                        req = urllib2.Request(self.wa_addr)
+
+                        try:
+                                handle = urllib2.urlopen(req)
+                        except IOError:
+                                print "ioerror"
+                        page_body=handle.read()
+                        handle.close()
+                        cfile=open(fname, 'w')
+                        cfile.write(page_body)
+                        cfile.close()
+
+		self.thepage = unicode( page_body,    "cp1251")
 		self.tree = etree.parse(StringIO(self.thepage), self.parser)
-		handle.close()
 
 	def get_title(self):
                 logging.debug ("Start get_title")
@@ -361,6 +373,7 @@ class necroposter():
 	def chkdirs(self):
 		self.mkdir(os.path.join (self.homedir ,'studio'))
 		self.mkdir(os.path.join (self.homedir, 'cover'))
+		self.mkdir(os.path.join (self.homedir, 'cache'))
 
 	def mkdir(self, dir):
                 if not os.path.isdir(dir):
