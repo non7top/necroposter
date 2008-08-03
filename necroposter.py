@@ -242,7 +242,7 @@ class necroposter():
 		tpl += "\n"
 		
 		tpl += "[url=%s][img]http://fstore5.aaanet.ru:8080/139774/world-art-logo.png[/img][/url]" % self.wa_addr
-		tpl += "[url=%s][img]=STUDIO_IMG_LINK=[/img][/url]" % self.studio['link']
+		tpl += " [url=%s][img]=STUDIO_IMG_LINK=[/img][/url]" % self.studio['link']
 		tpl += "\n"
 		tpl += "\n"
 		
