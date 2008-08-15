@@ -14,8 +14,8 @@ import logging
 
 from lxml import etree
 
-from lib import utils
-from lib import datadir
+from necrolib import utils
+from necrolib import datadir
 from cast import cast
 from cache import cache
 

@@ -10,8 +10,8 @@ import urllib2
 from StringIO import StringIO
 
 from lxml import etree
-from lib import utils
-from lib import datadir
+from necrolib import utils
+from necrolib import datadir
 from cache import cache
 import os
 
