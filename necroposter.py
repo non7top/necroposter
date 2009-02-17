@@ -130,8 +130,8 @@ class necroposter():
         
         def get_imglink(self):
                 logging.debug ("Start get_imglink")
-                #p="/html/body/center/table[6]/tr/td/table/tr/td[5]/table/tr/td/img"
-                p="/html/body/center/table[6]/tr/td/table/tr/td[5]/table[1]/tr/td[1]/a[1]/img"
+                #p="/html/body/center/table[6]/tr/td/table/tr/td[5]/table[1]/tr/td[1]/a[1]/img"
+                p="//img[starts-with(@src, 'img/')]"
                 r = self.tree.xpath(p)
                 link='http://www.world-art.ru/animation/' + r[0].get("src")
                 logging.debug ("Image link is: %s" % link)
@@ -356,6 +356,7 @@ class necroposter():
                 
                 #print self.imglink['fname']
                 #print self.studio['fname']
+                return tpl
         
         def chkdirs(self):
                 self.mkdir(os.path.join (self.homedir ,'studio'))
@@ -386,7 +387,7 @@ def main(n):
                 #print np.get_episodes()
                 np.init_data()
                 #print np.gen_bbcode()
-                np.gen_spark()
+                print np.gen_spark()
                 
 if __name__ == "__main__":
     main(sys.argv[1:])
