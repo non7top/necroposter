@@ -45,7 +45,7 @@ class necroposter():
 
         def get_title(self):
                 logging.debug ("Start get_title")
-                r = self.tree.xpath('/html/body/center/table[6]/tr/td/table/tr/td[5]/table[1]/tr/td[3]/font[1]/b')
+                r = self.tree.xpath('/html/body/center[2]/table[6]/tr/td/table/tr/td[5]/table[2]/tr/td[3]/font/b')
                 self.title = r[0].text[:-2].strip()
                 logging.debug ( "Got title: %s" % self.title )
                 return self.title
