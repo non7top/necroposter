@@ -100,8 +100,9 @@ class necroMediaMainWindow(KMainWindow):
     def refresh_info(self):
         self.ui.lb_name.setText("kjds")
         cover=QPixmap()
-        cover.load('/home/non7top/.necroposter/cover/6714.jpg')
-        self.ui.lb_cover.setPixmap(cover)
+        pict='/home/non7top/.necroposter/cover/6714.jpg'
+        if cover.load(pict):
+            self.ui.lb_cover.setPixmap(cover)
 
 
 
