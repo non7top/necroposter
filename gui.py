@@ -3,27 +3,45 @@
 import glob, os, re, sip, time,sys
 from dbus.service import method
 
-'''
-from PyQt4.QtCore import QObject, QString, QTimer, QVariant, Qt, SIGNAL
-from PyQt4.QtGui import QActionGroup, QLabel, QStackedWidget, QWidget
-from PyKDE4.kdecore import KConfig, KGlobal, KUrl, i18n
-from PyKDE4.kdeui import (
-    KActionMenu, KApplication, KDialog, KIcon, KLineEdit, KMessageBox,
-    KStandardAction, KVBox)
-from PyKDE4.kparts import KParts
-from PyKDE4.ktexteditor import KTextEditor
-'''
 from PyKDE4.kdecore import *
 from PyKDE4.kdeui import *
+from PyKDE4.kio import KFile, KFileDialog, KIO
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 from PyQt4 import uic
 
+import dirs_ui
 
-class necroMediaMainWindow(KMainWindow):
-    def __init__(self, *args):
-        KMainWindow.__init__(self, *args)
+class dirsWidget(QWidget,dirs_ui.Ui_Widget):
+    def __init__(self,parent):
+        QWidget.__init__(self, parent)
+        self.setupUi(self)
+        self.url.setMode(KFile.Directory)
+
+class PreferencesDialog(KConfigDialog):
+    def __init__(self, parent, name, preferences):
+        KConfigDialog.__init__(self, parent, name, preferences)
+        self.page = dirsWidget(self)
+        self.addPage(self.page, i18n("Storage setup"), 'media-dirs')
+
+
+
+class Preferences(KConfigSkeleton):
+    def __init__(self):
+        KConfigSkeleton.__init__(self)
+        self.setCurrentGroup("Storage")
+        self.dirs = QStringList()
+        self.dirs.append('/mnt/storage/Anime')
+        self.dirs.append('/mnt/large/Anime')
+        self.addItemStringList("media_dirs", self.dirs)
+        self.readConfig()
+
+class necroMediaMainWindow(KXmlGuiWindow):
+    def __init__(self):
+        KXmlGuiWindow.__init__(self)
+        #KMainWindow.__init__(self, *args)
         self.ui=uic.loadUi("nm.ui", self)
+        self.setupGUI()
         self.setWindowTitle("NecroMedia")
         self.mainlist=[]
 
@@ -32,12 +50,14 @@ class necroMediaMainWindow(KMainWindow):
         self.progressBar.setVisible(False)
         self.progressBar.setMaximumSize(90,25)
         self.statusBar().addWidget(self.progressBar)
-        self.addActions()
-        self.addMenu()
+        #self.addActions()
+        #self.addMenu()
         self.readdirs()
         self.populateList()
         self.connect(self.ui.main_lw, SIGNAL("itemClicked(QListWidgetItem*)"),
                 self.refresh_info)
+        self.config=Preferences()
+        #self.showSettings()
 
     def addActions(self):
         actions = KActionCollection(self)
@@ -74,7 +94,7 @@ class necroMediaMainWindow(KMainWindow):
         self.file.addAction(self.quitAction)
         self.help = KMenu(self)
         self.help.addAction(self.helpAction)
-        
+ 
         #create menu bar
         self.menuBar = KMenuBar(self)
         self.menuBar.addMenu(self.file)
@@ -85,11 +105,12 @@ class necroMediaMainWindow(KMainWindow):
             self.ui.main_lw.addItem(f)
 
     def readdirs(self):
-        dir='/home/non7top/anime'
+        dir='/mnt/virtual/Anime'
         d=QDir(dir)
         #d.setFilter(QDir.NoDotAndDotDot)
         flist=QStringList()
         flist=d.entryList()
+        print flist.count()
         k=0
         while k < flist.count():
             f=flist[k]
@@ -100,10 +121,15 @@ class necroMediaMainWindow(KMainWindow):
     def refresh_info(self):
         self.ui.lb_name.setText("kjds")
         cover=QPixmap()
-        pict='/home/non7top/.necroposter/cover/6714.jpg'
+        #pict='/home/non7top/.necroposter/cover/6714.jpg'
         if cover.load(pict):
             self.ui.lb_cover.setPixmap(cover)
 
+    def showSettings(self):
+       if(KConfigDialog.showDialog("settings")):
+           return
+       dialog = PreferencesDialog(self, "settings", self.config)
+       dialog.show()
 
 
 
