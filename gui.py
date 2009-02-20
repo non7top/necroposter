@@ -16,7 +16,7 @@ class dirsWidget(QWidget,dirs_ui.Ui_Widget):
     def __init__(self,parent):
         QWidget.__init__(self, parent)
         self.setupUi(self)
-        self.url.setMode(KFile.Directory)
+        self.kcfg_url.setMode(KFile.Directory)
 
 class PreferencesDialog(KConfigDialog):
     def __init__(self, parent, name, preferences):
@@ -24,24 +24,25 @@ class PreferencesDialog(KConfigDialog):
         self.page = dirsWidget(self)
         self.addPage(self.page, i18n("Storage setup"), 'media-dirs')
 
-
-
 class Preferences(KConfigSkeleton):
     def __init__(self):
         KConfigSkeleton.__init__(self)
         self.setCurrentGroup("Storage")
-        self.dirs = QStringList()
-        self.dirs.append('/mnt/storage/Anime')
-        self.dirs.append('/mnt/large/Anime')
-        self.addItemStringList("media_dirs", self.dirs)
+        self.url = QString()
+        #self.dirs.append('/mnt/storage/Anime')
+        #self.dirs.append('/mnt/large/Anime')
+        self.dirs = self.addItemString("url",self.url)
         self.readConfig()
+
+    def url(self):
+        return self.dirs.property().toString()
 
 class necroMediaMainWindow(KXmlGuiWindow):
     def __init__(self):
         KXmlGuiWindow.__init__(self)
         #KMainWindow.__init__(self, *args)
         self.ui=uic.loadUi("nm.ui", self)
-        self.setupGUI()
+        #self.setupGUI()
         self.setWindowTitle("NecroMedia")
         self.mainlist=[]
 
@@ -52,6 +53,7 @@ class necroMediaMainWindow(KXmlGuiWindow):
         self.connect(self.ui.main_lw, SIGNAL("itemClicked(QListWidgetItem*)"),
                 self.refresh_info)
         self.config=Preferences()
+        self.setupGUI()         #after setup actions
         #self.showSettings()
 
     def setupActions(self):
