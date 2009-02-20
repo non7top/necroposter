@@ -45,12 +45,7 @@ class necroMediaMainWindow(KXmlGuiWindow):
         self.setWindowTitle("NecroMedia")
         self.mainlist=[]
 
-        self.progressBar = QProgressBar(self)
-        self.progressBar.setRange(0, 0)
-        self.progressBar.setVisible(False)
-        self.progressBar.setMaximumSize(90,25)
-        self.statusBar().addWidget(self.progressBar)
-        #self.addActions()
+        self.setupActions()
         #self.addMenu()
         self.readdirs()
         self.populateList()
@@ -59,19 +54,9 @@ class necroMediaMainWindow(KXmlGuiWindow):
         self.config=Preferences()
         #self.showSettings()
 
-    def addActions(self):
-        actions = KActionCollection(self)
-        self.quitAction = KStandardAction.quit(self.close, actions)
-        #self.configureAction = KAction(self)
-        #self.configureAction.setIcon(QIcon (self.icons.loadIcon("configure", KIconLoader.Desktop)))
-        #self.connect(self.configureAction, SIGNAL("triggered()"), self.showConfigDialog)
-        #self.updateAction = KAction(self)
-        #self.updateAction.setIcon(QIcon (self.icons.loadIcon("knetattach", KIconLoader.Desktop)))
-        #self.configureAction.setIcon(QIcon('package_settings.png'))
-        #self.connect(self.updateAction, SIGNAL("triggered()"), self.checkForUpdate)
-        self.helpAction = KAction(self)
-        #self.helpAction.setIcon(QIcon (installPath + "/icons/" + 'info.png'))
-        #self.connect(self.helpAction, SIGNAL("triggered()"), self.showAboutAppDialog)
+    def setupActions(self):
+        KStandardAction.preferences(self.showSettings, self.actionCollection())
+        KStandardAction.quit(app.quit, self.actionCollection())
 
     def addMenu(self):
         helpMenu = KHelpMenu(self, KCmdLineArgs.aboutData())
@@ -157,6 +142,7 @@ def about():
 def main():
     aboutdata = KAboutData(about())
     KCmdLineArgs.init(sys.argv, aboutdata)
+    global app
     app = KApplication(1)
     #icon = KIcon("klxdvdrip.png")
     app.mainWindow=necroMediaMainWindow()
