@@ -362,6 +362,7 @@ class necroposter():
                 self.mkdir(os.path.join (self.homedir ,'studio'))
                 self.mkdir(os.path.join (self.homedir, 'cover'))
                 self.mkdir(os.path.join (self.homedir, 'cache'))
+                self.mkdir(os.path.join (self.homedir, 'mini'))
 
         def mkdir(self, dir):
                 if not os.path.isdir(dir):
