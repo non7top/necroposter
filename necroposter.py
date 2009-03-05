@@ -60,6 +60,7 @@ class necroposter():
                 self.names=[]
                 r = self.tree.xpath("/html/body/center/table[6]/tr/td/table/tr/td[5]/table/tr/td[3]/br")
                 for q in r:
+                    if q.tail != None:
                         self.names.append(q.tail)
                 return self.names
         
