@@ -24,7 +24,7 @@ class cast():
                 self.cache = cache(cached)
 		wa_addr = "http://world-art.ru/animation/animation_full_cast.php?id=%s" % self.id
                 fname=self.id + '.cast.cache'
-                body = self.cache.get_url(wa_addr, fname)
+                body = self.cache.dw_html(wa_addr, fname)
 
                 self.thepage = unicode( body,    "cp1251")
                 self.tree = etree.parse(StringIO(self.thepage), parser)

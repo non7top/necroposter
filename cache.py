@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf8 -*
 
 import os
 import urllib
@@ -31,7 +33,7 @@ class cache():
         else:
             return 0
 
-    def get_url(self, url, fname):
+    def dw_html(self, url, fname):
         if self.incache(fname):
             logging.debug ("Not re-downloading file")
             page_body=self.get(fname)
@@ -43,7 +45,26 @@ class cache():
                 handle = urllib2.urlopen(req)
             except IOError:
                 print "ioerror"
-                page_body=handle.read()
-                handle.close()
-                self.put(fname,page_body)
+            page_body=handle.read()
+            handle.close()
+            self.put(fname,page_body)
         return page_body
+
+    def dw_img(self, url, fname, referer=None):
+        if self.incache(fname):
+            logging.debug ("Not re-downloading image file")
+        else:
+            logging.info ( ("Downloading link %s to file %s") % (url, fname) )
+            outputFile = open(fname, "wb")
+            req = urllib2.Request(url)
+            if referer != None:
+                req.add_header("Referer", referer)
+            try:
+                handle = urllib2.urlopen(req)
+            except IOError, e:
+                logging.warning( "IOerror %s" % e)
+            data = handle.read()
+            outputFile.write(data)
+            outputFile.close()
+            handle.close()
+
