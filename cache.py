@@ -10,7 +10,10 @@ import logging
 
 class cache():
     def __init__ (self, storage, enable = 1):
+        if not os.path.isdir(storage):
+            os.makedirs(storage)
         self.storage=storage
+
 
     def get(self, fname):
         k = os.path.join(self.storage, fname)

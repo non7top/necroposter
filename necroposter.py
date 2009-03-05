@@ -22,21 +22,28 @@ from cache import cache
 logging.basicConfig(level=logging.DEBUG)
 
 class necroposter():
-        def __init__(self):
+        def __init__(self, wa_addr, cachedir=None):
                 logging.debug ("Init necroposter class")
                 self.parser = etree.HTMLParser()
-                self.homedir = datadir.user_data_dir("necroposter")
-                logging.info ("Datadir is: %s" % self.homedir)
                 self.chkdirs()
-                self.caching = 1
-                cachedir=os.path.join (self.homedir, "cache")
-                self.cache = cache (cachedir)
 
-        def dw_wapage(self,  wa_addr):
-                logging.debug ( "Start dw_wapage" )
+                self.caching = 1
                 self.pagenum = utils.getnum(wa_addr)
+                if cachedir == None:
+                    '''will use local storage'''
+                    self.homedir = os.path.join(datadir.user_data_dir("necroposter"), self.pagenum)
+                else:
+                    '''will use provided path'''
+                    self.homedir = cachedir
+                
+                logging.info ("Datadir is: %s" % self.homedir)
+                self.caching = 1
+                self.cache = cache (self.homedir)
+
+        def dw_wapage(self):
+                logging.debug ( "Start dw_wapage" )
                 self.wa_addr = "http://www.world-art.ru/animation/animation.php?id=%s" % self.pagenum
-                fname=self.pagenum + '.cache'
+                fname=os.path.join(self.homedir, self.fnames['wa_main'])
                 
                 # TODO: gzip the cache
                 page_body = self.cache.dw_html(self.wa_addr, fname)
@@ -337,10 +344,11 @@ class necroposter():
                 return tpl
         
         def chkdirs(self):
-                self.mkdir(os.path.join (self.homedir ,'studio'))
-                self.mkdir(os.path.join (self.homedir, 'cover'))
-                self.mkdir(os.path.join (self.homedir, 'cache'))
-                self.mkdir(os.path.join (self.homedir, 'mini'))
+            self.fnames={}
+            self.fnames['studio'] = 'studio.jpg'
+            self.fnames['cover'] =  'cover.jpg'
+            self.fnames['mini'] =  'mini.jpg'
+            self.fnames['wa_main'] = 'wa_main.cache'
 
         def mkdir(self, dir):
                 if not os.path.isdir(dir):
@@ -361,8 +369,8 @@ def main(n):
                 print "Give pagenumber or full link as an argument"
                 sys.exit(1)
         else:
-                np=necroposter()
-                np.dw_wapage(n[0])
+                np=necroposter(n[0])
+                np.dw_wapage()
                 #print np.get_episodes()
                 np.init_data()
                 #print np.gen_bbcode()
