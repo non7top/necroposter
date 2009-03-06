@@ -39,8 +39,8 @@ class necroposter():
                 fname=self.pagenum + '.cache'
                 
                 # TODO: gzip the cache
-                page_body = self.cache.get_url(self.wa_addr, fname)
-                self.thepage = unicode( page_body,    "cp1251")
+                page_body = self.cache.dw_html(self.wa_addr, fname)
+                self.thepage = unicode(page_body, "cp1251")
                 self.tree = etree.parse(StringIO(self.thepage), self.parser)
 
         def get_title(self):
@@ -60,6 +60,7 @@ class necroposter():
                 self.names=[]
                 r = self.tree.xpath("/html/body/center/table[6]/tr/td/table/tr/td[5]/table/tr/td[3]/br")
                 for q in r:
+                    if q.tail != None:
                         self.names.append(q.tail)
                 return self.names
         
@@ -162,32 +163,9 @@ class necroposter():
                 self.studio['fname'] = os.path.join (self.homedir, "studio/%s.jpg" %self.studio['num'])
                 
                 '''качаем эмблему студии'''
-                self.dw_img(self.studio)
+                self.cache.dw_img(self.studio['imglink'], self.studio['fname'])
                 logging.info ("Studio emblem: %s" %self.studio['fname'])
         
-        '''утиль для скачивания файла, на входе получает словарь с эелементами
-        imglink и fname'''
-        def dw_img(self, imglink):
-                fname=imglink['fname']
-                if self.caching == 1:
-                        if os.path.isfile(fname):
-                                logging.debug ("Not re-downloading file")
-                                return 0 
-                link=imglink['imglink']
-                logging.info ( ("Downloading link %s to file %s") % (link, fname) )
-                outputFile = open(fname, "wb")
-                req = urllib2.Request(link)
-                req.add_header("Referer", self.wa_addr)
-                try:
-                        handle = urllib2.urlopen(req)
-                except IOError, e:
-                        print "ioerror ", e
-                
-                data = handle.read()
-                outputFile.write(data)
-                outputFile.close()
-                handle.close()
-                
         def init_data(self):
                 logging.debug ("Start init_data")
                 self.get_title()
@@ -202,7 +180,7 @@ class necroposter():
                 self.get_actors()
                 il=self.get_imglink()
                 self.get_studio()
-                self.dw_img(il)
+                self.cache.dw_img(il['imglink'], il['fname'], self.wa_addr)
                 logging.debug ("Finished init_data")
 
         def gen_bbcode(self):
