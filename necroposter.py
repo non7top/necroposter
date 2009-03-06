@@ -261,10 +261,10 @@ class necroposter():
         def gen_spark(self):
                 tpl=self.title
 
-#                tpl += "\n"
-#                for q in self.names:
-#                        tpl += q + "\n"
-#                tpl += "\n-----------------------------\n"
+                tpl += "\n"
+                for q in self.names:
+                        tpl += q + "\n"
+                tpl += "\n-----------------------------\n"
                 
                 tpl += u"Жанр: "
                 for q in self.jenres:
