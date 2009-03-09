@@ -10,6 +10,8 @@ from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 from PyQt4 import uic
 
+from necroposter import necroposter
+
 import dirs_ui
 
 class dirsWidget(QWidget,dirs_ui.Ui_Widget):
@@ -50,7 +52,7 @@ class necroMediaMainWindow(KXmlGuiWindow):
         #self.addMenu()
         self.readdirs()
         self.populateList()
-        self.connect(self.ui.main_lw, SIGNAL("itemClicked(QListWidgetItem*)"),
+        self.connect(self.ui.main_lw, SIGNAL("itemClicked(QListWidgetItem *)"),
                 self.refresh_info)
         self.config=Preferences()
         self.setupGUI()         #after setup actions
@@ -92,24 +94,42 @@ class necroMediaMainWindow(KXmlGuiWindow):
             self.ui.main_lw.addItem(f)
 
     def readdirs(self):
-        dir='/mnt/virtual/Anime'
+        dir='/home/non7top/anime'
         d=QDir(dir)
         #d.setFilter(QDir.NoDotAndDotDot)
-        flist=QStringList()
+        #flist=QStringList()
+        self.list=[]
         flist=d.entryList()
-        print flist.count()
         k=0
         while k < flist.count():
             f=flist[k]
             if f not in ('.', '..'):
+                lentry={}
+                lentry['path']=os.path.join(dir,str(f))
+                self.list.append(lentry)
                 self.mainlist.append(f)
             k+=1
 
-    def refresh_info(self):
-        self.ui.lb_name.setText("kjds")
+    def refresh_info(self, item):
+        id=self.ui.main_lw.row(item)
+        path = self.list[id]['path']
+        homepath=os.path.join(path,'.anime')
+        idfile=os.path.join(homepath,'id')
+        '''read id'''
+        if os.path.exists(idfile):
+            wa_id=int(open(idfile,'r').read().strip())
+            print wa_id
+        else:
+            print "no cache"
+            return
+
+        np=necroposter(str(wa_id), homepath)
+        self.ui.lb_title.setText(np.get_title())
+
+
+        print np.fnames['studio_full']
         cover=QPixmap()
-        #pict='/home/non7top/.necroposter/cover/6714.jpg'
-        if cover.load(pict):
+        if cover.load(np.fnames['cover_full']):
             self.ui.lb_cover.setPixmap(cover)
 
     def showSettings(self):

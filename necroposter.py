@@ -25,7 +25,6 @@ class necroposter():
         def __init__(self, wa_addr, cachedir=None):
                 logging.debug ("Init necroposter class")
                 self.parser = etree.HTMLParser()
-                self.chkdirs()
 
                 self.caching = 1
                 self.pagenum = utils.getnum(wa_addr)
@@ -37,15 +36,24 @@ class necroposter():
                 else:
                     '''will use provided path'''
                     self.homedir = cachedir
+
+                self.chkdirs()
                 
                 logging.info ("Datadir is: %s" % self.homedir)
                 self.caching = 1
                 self.cache = cache (self.homedir, referer=self.wa_addr)
+                self.parse_cache()
+
+        def parse_cache(self):
+            logging.debug ( "Start parsing cache" )
+            page_body = self.cache.dw_html(self.wa_addr, self.fnames['wa_main'])
+            self.thepage = unicode(page_body, "cp1251")
+            self.tree = etree.parse(StringIO(self.thepage), self.parser)
+
 
         def dw_wapage(self):
                 logging.debug ( "Start dw_wapage" )
                 
-                # TODO: gzip the cache
                 page_body = self.cache.dw_html(self.wa_addr, self.fnames['wa_main'])
                 self.thepage = unicode(page_body, "cp1251")
                 self.tree = etree.parse(StringIO(self.thepage), self.parser)
@@ -81,7 +89,6 @@ class necroposter():
         
         def get_type(self):
                 p="/html/body/center/table[6]/tr/td/table/tr/td[5]/table/tr/td[3]/font[3]/b[3]"
-                #p="/html/body/center/table[6]/tbody/tr/td/table/tbody/tr/td[5]/table[1]/tbody/tr/td[3]/font[2]/b[3]"
                 r = self.tree.xpath(p)
                 self.type = r[0].tail[2:]
                 return self.type
@@ -346,7 +353,11 @@ class necroposter():
         def chkdirs(self):
             self.fnames={}
             self.fnames['studio'] = 'studio.jpg'
+            self.fnames['studio_full'] = os.path.join(self.homedir,
+                    'studio.jpg')
             self.fnames['cover'] =  'cover.jpg'
+            self.fnames['cover_full'] = os.path.join(self.homedir,
+                    'cover.jpg')
             self.fnames['mini'] =  'mini.jpg'
             self.fnames['wa_main'] = 'wa_main.cache'
 
