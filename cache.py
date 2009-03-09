@@ -9,10 +9,11 @@ import logging
 
 
 class cache():
-    def __init__ (self, storage, enable = 1):
+    def __init__ (self, storage, referer=None, enable = 1):
         if not os.path.isdir(storage):
             os.makedirs(storage)
         self.storage=storage
+        self.referer=referer
 
 
     def get(self, fname):
@@ -53,21 +54,19 @@ class cache():
             self.put(fname,page_body)
         return page_body
 
-    def dw_img(self, url, fname, referer=None):
+    def dw_img(self, url, fname):
         if self.incache(fname):
             logging.debug ("Not re-downloading image file")
         else:
             logging.info ( ("Downloading link %s to file %s") % (url, fname) )
-            outputFile = open(fname, "wb")
             req = urllib2.Request(url)
-            if referer != None:
-                req.add_header("Referer", referer)
+            if self.referer != None:
+                req.add_header("Referer", self.referer)
             try:
                 handle = urllib2.urlopen(req)
             except IOError, e:
                 logging.warning( "IOerror %s" % e)
             data = handle.read()
-            outputFile.write(data)
-            outputFile.close()
             handle.close()
+            self.put(fname, data)
 

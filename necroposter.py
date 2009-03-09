@@ -29,6 +29,8 @@ class necroposter():
 
                 self.caching = 1
                 self.pagenum = utils.getnum(wa_addr)
+                self.wa_addr = "http://www.world-art.ru/animation/animation.php?id=%s" % self.pagenum
+
                 if cachedir == None:
                     '''will use local storage'''
                     self.homedir = os.path.join(datadir.user_data_dir("necroposter"), self.pagenum)
@@ -38,15 +40,13 @@ class necroposter():
                 
                 logging.info ("Datadir is: %s" % self.homedir)
                 self.caching = 1
-                self.cache = cache (self.homedir)
+                self.cache = cache (self.homedir, referer=self.wa_addr)
 
         def dw_wapage(self):
                 logging.debug ( "Start dw_wapage" )
-                self.wa_addr = "http://www.world-art.ru/animation/animation.php?id=%s" % self.pagenum
-                fname=os.path.join(self.homedir, self.fnames['wa_main'])
                 
                 # TODO: gzip the cache
-                page_body = self.cache.dw_html(self.wa_addr, fname)
+                page_body = self.cache.dw_html(self.wa_addr, self.fnames['wa_main'])
                 self.thepage = unicode(page_body, "cp1251")
                 self.tree = etree.parse(StringIO(self.thepage), self.parser)
 
@@ -170,7 +170,7 @@ class necroposter():
                 self.studio['fname'] = os.path.join (self.homedir, "studio/%s.jpg" %self.studio['num'])
                 
                 '''качаем эмблему студии'''
-                self.cache.dw_img(self.studio['imglink'], self.studio['fname'])
+                self.cache.dw_img(self.studio['imglink'], self.fnames['studio'])
                 logging.info ("Studio emblem: %s" %self.studio['fname'])
         
         def init_data(self):
@@ -187,7 +187,7 @@ class necroposter():
                 self.get_actors()
                 il=self.get_imglink()
                 self.get_studio()
-                self.cache.dw_img(il['imglink'], il['fname'], self.wa_addr)
+                self.cache.dw_img(il['imglink'], self.fnames['cover'])
                 logging.debug ("Finished init_data")
 
         def gen_bbcode(self):
