@@ -22,24 +22,31 @@ from cache import cache
 logging.basicConfig(level=logging.DEBUG)
 
 class necroposter():
-        def __init__(self):
+        def __init__(self, wa_addr, cachedir=None):
                 logging.debug ("Init necroposter class")
                 self.parser = etree.HTMLParser()
-                self.homedir = datadir.user_data_dir("necroposter")
-                logging.info ("Datadir is: %s" % self.homedir)
                 self.chkdirs()
-                self.caching = 1
-                cachedir=os.path.join (self.homedir, "cache")
-                self.cache = cache (cachedir)
 
-        def dw_wapage(self,  wa_addr):
-                logging.debug ( "Start dw_wapage" )
+                self.caching = 1
                 self.pagenum = utils.getnum(wa_addr)
                 self.wa_addr = "http://www.world-art.ru/animation/animation.php?id=%s" % self.pagenum
-                fname=self.pagenum + '.cache'
+
+                if cachedir == None:
+                    '''will use local storage'''
+                    self.homedir = os.path.join(datadir.user_data_dir("necroposter"), self.pagenum)
+                else:
+                    '''will use provided path'''
+                    self.homedir = cachedir
+                
+                logging.info ("Datadir is: %s" % self.homedir)
+                self.caching = 1
+                self.cache = cache (self.homedir, referer=self.wa_addr)
+
+        def dw_wapage(self):
+                logging.debug ( "Start dw_wapage" )
                 
                 # TODO: gzip the cache
-                page_body = self.cache.dw_html(self.wa_addr, fname)
+                page_body = self.cache.dw_html(self.wa_addr, self.fnames['wa_main'])
                 self.thepage = unicode(page_body, "cp1251")
                 self.tree = etree.parse(StringIO(self.thepage), self.parser)
 
@@ -126,7 +133,7 @@ class necroposter():
 
         
         def get_actors(self):
-            c=cast(self.pagenum)
+            c=cast(self.pagenum, self.cache)
             self.actors=c.get_actors()
         
         def get_imglink(self):
@@ -163,7 +170,7 @@ class necroposter():
                 self.studio['fname'] = os.path.join (self.homedir, "studio/%s.jpg" %self.studio['num'])
                 
                 '''качаем эмблему студии'''
-                self.cache.dw_img(self.studio['imglink'], self.studio['fname'])
+                self.cache.dw_img(self.studio['imglink'], self.fnames['studio'])
                 logging.info ("Studio emblem: %s" %self.studio['fname'])
         
         def init_data(self):
@@ -180,7 +187,7 @@ class necroposter():
                 self.get_actors()
                 il=self.get_imglink()
                 self.get_studio()
-                self.cache.dw_img(il['imglink'], il['fname'], self.wa_addr)
+                self.cache.dw_img(il['imglink'], self.fnames['cover'])
                 logging.debug ("Finished init_data")
 
         def gen_bbcode(self):
@@ -337,10 +344,11 @@ class necroposter():
                 return tpl
         
         def chkdirs(self):
-                self.mkdir(os.path.join (self.homedir ,'studio'))
-                self.mkdir(os.path.join (self.homedir, 'cover'))
-                self.mkdir(os.path.join (self.homedir, 'cache'))
-                self.mkdir(os.path.join (self.homedir, 'mini'))
+            self.fnames={}
+            self.fnames['studio'] = 'studio.jpg'
+            self.fnames['cover'] =  'cover.jpg'
+            self.fnames['mini'] =  'mini.jpg'
+            self.fnames['wa_main'] = 'wa_main.cache'
 
         def mkdir(self, dir):
                 if not os.path.isdir(dir):
@@ -361,8 +369,8 @@ def main(n):
                 print "Give pagenumber or full link as an argument"
                 sys.exit(1)
         else:
-                np=necroposter()
-                np.dw_wapage(n[0])
+                np=necroposter(n[0])
+                np.dw_wapage()
                 #print np.get_episodes()
                 np.init_data()
                 #print np.gen_bbcode()
