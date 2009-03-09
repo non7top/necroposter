@@ -16,19 +16,16 @@ from cache import cache
 import os
 
 class cast():
-	def __init__(self, wa_id):
+	def __init__(self, wa_id, cache):
                 parser = etree.HTMLParser()
 		self.id=wa_id
-                self.homedir = datadir.user_data_dir("necroposter")
-                cached = os.path.join (self.homedir, 'cache')
-                self.cache = cache(cached)
+                self.cache = cache
 		wa_addr = "http://world-art.ru/animation/animation_full_cast.php?id=%s" % self.id
-                fname=self.id + '.cast.cache'
+                fname='cast.cache'
                 body = self.cache.dw_html(wa_addr, fname)
 
-                self.thepage = unicode( body,    "cp1251")
+                self.thepage = unicode(body, "cp1251")
                 self.tree = etree.parse(StringIO(self.thepage), parser)
-                #self.thepage, self.tree = utils.dw_wapage(wa_addr)
                 self.get_actors()
 
 	def get_actors(self):

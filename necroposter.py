@@ -133,7 +133,7 @@ class necroposter():
 
         
         def get_actors(self):
-            c=cast(self.pagenum)
+            c=cast(self.pagenum, self.cache)
             self.actors=c.get_actors()
         
         def get_imglink(self):
